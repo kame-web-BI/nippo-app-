@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>日報アプリ（試作）</title>
+  <title>日報アプリ</title>
   <style>
     body { font-family: sans-serif; padding: 15px; }
-    input, select, textarea, button {
+    input, textarea, button {
       width: 100%; margin-bottom: 10px; padding: 10px;
       font-size: 16px;
     }
@@ -39,12 +39,8 @@
   <button type="submit">送信</button>
 </form>
 
-<h2>送信データ（簡易保存）</h2>
-<ul id="list"></ul>
-
 <script>
 const form = document.getElementById('reportForm');
-const list = document.getElementById('list');
 
 form.addEventListener('submit', function(e) {
   e.preventDefault();
@@ -58,39 +54,18 @@ form.addEventListener('submit', function(e) {
     time: document.getElementById('time').value
   };
 
-  // ローカル保存
-  let reports = JSON.parse(localStorage.getItem('reports')) || [];
-  reports.push(data);
-  localStorage.setItem('reports', JSON.stringify(reports));
-
- fetch(https://script.google.com/macros/s/AKfycbxMSUKH37gUrIwyOTIwdiZjyw1zKUPxu4NqmxAnUcSV9jHMidF1wJ90B01fqZZcaNwD/exec
-, {
-  method: "POST",
-  body: JSON.stringify(data),
-  headers: {
-    "Content-Type": "application/json"
-  }
-})
-.then(() => {
-  alert("送信完了！");
-});
-
-displayReports();
-form.reset();
-});
-
-function displayReports() {
-  list.innerHTML = "";
-  let reports = JSON.parse(localStorage.getItem('reports')) || [];
-
-  reports.forEach(r => {
-    let li = document.createElement('li');
-    li.textContent = `${r.date}｜${r.name}｜${r.site}｜${r.work}｜${r.machine}(${r.time}h)`;
-    list.appendChild(li);
+  fetch("https://script.google.com/macros/s/AKfycbxMSUKH37gUrIwyOTIwdiZjyw1zKUPxu4NqmxAnUcSV9jHMidF1wJ90B01fqZZcaNwD/exec", {
+    method: "POST",
+    mode: "no-cors",
+    body: JSON.stringify(data),
+    headers: {
+      "Content-Type": "application/json"
+    }
   });
-}
 
-displayReports();
+  alert("送信しました！");
+  form.reset();
+});
 </script>
 
 </body>
