@@ -63,8 +63,20 @@ form.addEventListener('submit', function(e) {
   reports.push(data);
   localStorage.setItem('reports', JSON.stringify(reports));
 
-  displayReports();
-  form.reset();
+ fetch(https://script.google.com/macros/s/AKfycbxMSUKH37gUrIwyOTIwdiZjyw1zKUPxu4NqmxAnUcSV9jHMidF1wJ90B01fqZZcaNwD/exec
+, {
+  method: "POST",
+  body: JSON.stringify(data),
+  headers: {
+    "Content-Type": "application/json"
+  }
+})
+.then(() => {
+  alert("送信完了！");
+});
+
+displayReports();
+form.reset();
 });
 
 function displayReports() {
