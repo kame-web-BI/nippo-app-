@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>日報アプリ（試作）</title>
+  <style>
+    body { font-family: sans-serif; padding: 15px; }
+    input, select, textarea, button {
+      width: 100%; margin-bottom: 10px; padding: 10px;
+      font-size: 16px;
+    }
+    button { background: #007bff; color: white; border: none; }
+  </style>
+</head>
+<body>
+
+<h2>日報入力</h2>
+
+<form id="reportForm">
+  <label>日付</label>
+  <input type="date" id="date" required>
+
+  <label>名前</label>
+  <input type="text" id="name" required>
+
+  <label>現場名</label>
+  <input type="text" id="site" required>
+
+  <label>仕事内容</label>
+  <textarea id="work" required></textarea>
+
+  <label>使用した重機</label>
+  <input type="text" id="machine">
+
+  <label>使用時間（時間）</label>
+  <input type="number" id="time" step="0.5">
+
+  <button type="submit">送信</button>
+</form>
+
+<h2>送信データ（簡易保存）</h2>
+<ul id="list"></ul>
+
+<script>
+const form = document.getElementById('reportForm');
+const list = document.getElementById('list');
+
+form.addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  const data = {
+    date: document.getElementById('date').value,
+    name: document.getElementById('name').value,
+    site: document.getElementById('site').value,
+    work: document.getElementById('work').value,
+    machine: document.getElementById('machine').value,
+    time: document.getElementById('time').value
+  };
+
+  // ローカル保存
+  let reports = JSON.parse(localStorage.getItem('reports')) || [];
+  reports.push(data);
+  localStorage.setItem('reports', JSON.stringify(reports));
+
+  displayReports();
+  form.reset();
+});
+
+function displayReports() {
+  list.innerHTML = "";
+  let reports = JSON.parse(localStorage.getItem('reports')) || [];
+
+  reports.forEach(r => {
+    let li = document.createElement('li');
+    li.textContent = `${r.date}｜${r.name}｜${r.site}｜${r.work}｜${r.machine}(${r.time}h)`;
+    list.appendChild(li);
+  });
+}
+
+displayReports();
+</script>
+
+</body>
+</html>
