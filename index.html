@@ -10,6 +10,8 @@ body {
   font-family: sans-serif;
   padding: 15px;
   font-size: 22px;
+  max-width: 700px;
+  margin: auto;
 }
 
 input, textarea, button {
@@ -17,6 +19,7 @@ input, textarea, button {
   margin-bottom: 15px;
   padding: 15px;
   font-size: 22px;
+  box-sizing: border-box;
 }
 
 button {
@@ -25,6 +28,20 @@ button {
   border: none;
   height: 70px;
   font-size: 24px;
+  border-radius: 8px;
+}
+
+h3 {
+  margin-top: 25px;
+  margin-bottom: 10px;
+}
+
+.machine-block {
+  border: 1px solid #ccc;
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  background: #f9f9f9;
 }
 </style>
 </head>
@@ -41,43 +58,79 @@ button {
 <label>名前</label>
 <input type="text" id="name" readonly>
 
-<label>現場名</label>
-<input type="text" id="site" placeholder="例：〇〇工事">
+<label>現場</label>
+<input type="text" id="site">
 
-<label>作業内容</label>
-<textarea id="work" placeholder="例：掘削・整地"></textarea>
+<label>作業</label>
+<textarea id="work"></textarea>
 
-<label>作業時間（時間）</label>
-<input type="number" id="time" step="0.5" placeholder="例：2">
+<h3>重機入力</h3>
+
+<div class="machine-block">
+  <label>重機1</label>
+  <input type="text" id="machine1">
+
+  <label>重機時間1</label>
+  <input type="number" id="machineTime1" step="0.5" placeholder="8">
+</div>
+
+<div class="machine-block">
+  <label>重機2</label>
+  <input type="text" id="machine2">
+
+  <label>重機時間2</label>
+  <input type="number" id="machineTime2" step="0.5" placeholder="8">
+</div>
+
+<div class="machine-block">
+  <label>重機3</label>
+  <input type="text" id="machine3">
+
+  <label>重機時間3</label>
+  <input type="number" id="machineTime3" step="0.5" placeholder="8">
+</div>
+
+<label>作業時間</label>
+<input type="number" id="time" step="0.5" placeholder="8">
 
 <button type="submit">送信</button>
 
 </form>
 
 <script>
-// 日付自動
 const today = new Date().toISOString().split('T')[0];
 document.getElementById("date").value = today;
 
-// 名前自動
 let savedName = localStorage.getItem("workerName");
-
 if (!savedName) {
   savedName = prompt("最初に名前を入力してください");
   localStorage.setItem("workerName", savedName);
 }
-
 document.getElementById("name").value = savedName;
 
-// 送信処理
 document.getElementById("reportForm").addEventListener("submit", function(e) {
   e.preventDefault();
+
+  const machines = [];
+  const machineTimes = [];
+
+  for (let i = 1; i <= 3; i++) {
+    const machine = document.getElementById("machine" + i).value.trim();
+    const machineTime = document.getElementById("machineTime" + i).value.trim();
+
+    if (machine || machineTime) {
+      machines.push(machine);
+      machineTimes.push(machineTime);
+    }
+  }
 
   const data = {
     date: document.getElementById("date").value,
     name: document.getElementById("name").value,
     site: document.getElementById("site").value,
     work: document.getElementById("work").value,
+    machine: machines.join(" / "),
+    machineTime: machineTimes.join(" / "),
     time: document.getElementById("time").value
   };
 
@@ -90,7 +143,6 @@ document.getElementById("reportForm").addEventListener("submit", function(e) {
   alert("送信できました！");
   this.reset();
 
-  // 日付と名前は再セット
   document.getElementById("date").value = today;
   document.getElementById("name").value = savedName;
 });
