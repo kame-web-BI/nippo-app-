@@ -1,38 +1,75 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>日報アプリ</title>
-  <style>
-    body { font-family: sans-serif; padding: 15px; }
-    input, textarea, button {
-      width: 100%; margin-bottom: 10px; padding: 12px;
-      font-size: 16px;
-    }
-    button {
-      background: #007bff;
-      color: white;
-      border: none;
-      font-weight: bold;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>かんたん日報</title>
+
+<style>
+body {
+  font-family: sans-serif;
+  padding: 15px;
+  font-size: 22px;
+}
+
+input, textarea, button {
+  width: 100%;
+  margin-bottom: 15px;
+  padding: 15px;
+  font-size: 22px;
+}
+
+button {
+  background: #007bff;
+  color: white;
+  border: none;
+  height: 70px;
+  font-size: 24px;
+}
+</style>
 </head>
+
 <body>
 
-<h2>日報入力</h2>
+<h2>かんたん日報</h2>
 
 <form id="reportForm">
-  <input type="date" id="date" required>
-  <input type="text" id="name" placeholder="名前" required>
-  <input type="text" id="site" placeholder="現場名" required>
-  <textarea id="work" placeholder="仕事内容" required></textarea>
-  <input type="text" id="machine" placeholder="重機">
-  <input type="number" id="time" placeholder="時間（例：2.5）" step="0.5">
-  <button type="submit">送信</button>
+
+<label>日付</label>
+<input type="date" id="date" readonly>
+
+<label>名前</label>
+<input type="text" id="name" readonly>
+
+<label>現場名</label>
+<input type="text" id="site" placeholder="例：〇〇工事">
+
+<label>作業内容</label>
+<textarea id="work" placeholder="例：掘削・整地"></textarea>
+
+<label>作業時間（時間）</label>
+<input type="number" id="time" step="0.5" placeholder="例：2">
+
+<button type="submit">送信</button>
+
 </form>
 
 <script>
+// 日付自動
+const today = new Date().toISOString().split('T')[0];
+document.getElementById("date").value = today;
+
+// 名前自動
+let savedName = localStorage.getItem("workerName");
+
+if (!savedName) {
+  savedName = prompt("最初に名前を入力してください");
+  localStorage.setItem("workerName", savedName);
+}
+
+document.getElementById("name").value = savedName;
+
+// 送信処理
 document.getElementById("reportForm").addEventListener("submit", function(e) {
   e.preventDefault();
 
@@ -41,7 +78,6 @@ document.getElementById("reportForm").addEventListener("submit", function(e) {
     name: document.getElementById("name").value,
     site: document.getElementById("site").value,
     work: document.getElementById("work").value,
-    machine: document.getElementById("machine").value,
     time: document.getElementById("time").value
   };
 
@@ -51,8 +87,12 @@ document.getElementById("reportForm").addEventListener("submit", function(e) {
     body: JSON.stringify(data)
   });
 
-  alert("送信完了！");
+  alert("送信できました！");
   this.reset();
+
+  // 日付と名前は再セット
+  document.getElementById("date").value = today;
+  document.getElementById("name").value = savedName;
 });
 </script>
 
