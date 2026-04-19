@@ -1,74 +1,476 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>日報の二度手間をなくす</title>
-<style>
-body{font-family:sans-serif;margin:0;background:#f5f5f5}
-.container{max-width:900px;margin:auto;padding:20px}
-h1{font-size:32px;line-height:1.4}
-.box{background:white;padding:20px;margin:20px 0;border-radius:10px}
-.btn{display:block;text-align:center;background:black;color:white;padding:18px;margin-top:20px;text-decoration:none;border-radius:8px;font-size:18px}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>日報、まだ2回入力してませんか？ | 日報コスト削減ラボ</title>
+  <meta name="description" content="手書き日報→Excel入力の二度手間を、スマホ1回入力で解消。小規模〜中規模の土木・建設会社向け日報システムのデモLPです。" />
+  <style>
+    :root{
+      --navy:#0d1b2a;
+      --navy-2:#14263d;
+      --blue:#1d4ed8;
+      --sky:#dbeafe;
+      --bg:#f5f7fb;
+      --card:#ffffff;
+      --text:#1f2937;
+      --muted:#5b6472;
+      --line:#e5e7eb;
+      --accent:#f59e0b;
+      --shadow:0 20px 50px rgba(13,27,42,.12);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP",sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      line-height:1.8;
+    }
+    a{text-decoration:none;color:inherit}
+    .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+    .site-header{
+      position:sticky;top:0;z-index:10;
+      backdrop-filter: blur(12px);
+      background:rgba(245,247,251,.82);
+      border-bottom:1px solid rgba(229,231,235,.7);
+    }
+    .header-inner{
+      display:flex;align-items:center;justify-content:space-between;
+      min-height:72px;
+    }
+    .brand{
+      display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:.02em;
+    }
+    .brand-mark{
+      width:42px;height:42px;border-radius:14px;
+      background:linear-gradient(135deg,var(--navy),var(--blue));
+      color:#fff;display:flex;align-items:center;justify-content:center;
+      font-size:14px;font-weight:800;box-shadow:var(--shadow)
+    }
+    .header-cta{
+      display:flex;gap:12px;align-items:center;
+    }
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;
+      min-height:52px;padding:0 20px;border-radius:999px;
+      font-weight:800;border:1px solid transparent;
+      transition:.2s ease;
+    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn-primary{background:var(--navy);color:#fff;box-shadow:var(--shadow)}
+    .btn-secondary{background:#fff;border-color:var(--line);color:var(--navy)}
+    .hero{
+      position:relative;overflow:hidden;
+      background:
+        radial-gradient(circle at 10% 10%, rgba(245,158,11,.12), transparent 28%),
+        radial-gradient(circle at 92% 12%, rgba(29,78,216,.18), transparent 24%),
+        linear-gradient(180deg,#f8fbff 0%, #eef4fb 100%);
+      border-bottom:1px solid var(--line);
+    }
+    .hero-inner{
+      display:grid;grid-template-columns:1.08fr .92fr;gap:38px;
+      align-items:center;padding:76px 0 60px;
+    }
+    .eyebrow{
+      display:inline-flex;align-items:center;gap:8px;
+      min-height:36px;padding:0 14px;border-radius:999px;
+      background:#fff;border:1px solid var(--line);
+      color:var(--navy);font-weight:800;font-size:13px;
+      box-shadow:0 10px 30px rgba(13,27,42,.06);
+    }
+    h1{
+      margin:18px 0 18px;
+      font-size:clamp(34px,5vw,58px);
+      line-height:1.18;letter-spacing:-.03em;
+      color:var(--navy);
+    }
+    .lead{
+      margin:0 0 26px;
+      font-size:clamp(17px,2vw,21px);
+      color:var(--muted);
+      max-width:40em;
+    }
+    .hero-points{
+      display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;
+      margin:26px 0 30px;
+    }
+    .point{
+      background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px 18px;
+      box-shadow:0 14px 34px rgba(13,27,42,.05);
+      font-weight:700;
+    }
+    .point small{display:block;color:var(--muted);font-weight:600}
+    .hero-card{
+      position:relative;
+      background:linear-gradient(160deg,var(--navy) 0%, var(--navy-2) 100%);
+      color:#fff;border-radius:28px;padding:26px;box-shadow:var(--shadow);
+      min-height:520px;overflow:hidden;
+    }
+    .hero-card:before{
+      content:"";position:absolute;inset:auto -80px -80px auto;width:260px;height:260px;border-radius:50%;
+      background:rgba(255,255,255,.07);
+    }
+    .hero-card:after{
+      content:"";position:absolute;inset:40px auto auto -40px;width:180px;height:180px;border-radius:28px;
+      background:rgba(255,255,255,.04);transform:rotate(18deg);
+    }
+    .mock-top{
+      position:relative;z-index:1;
+      display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;
+      color:rgba(255,255,255,.82)
+    }
+    .mock-badge{
+      display:inline-flex;align-items:center;justify-content:center;
+      min-height:34px;padding:0 12px;border-radius:999px;
+      background:rgba(255,255,255,.1);font-size:12px;font-weight:800;
+    }
+    .mock-panel{
+      position:relative;z-index:1;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:22px;padding:20px 18px;margin-top:14px;
+      backdrop-filter:blur(6px);
+    }
+    .mock-title{
+      font-size:24px;font-weight:900;margin:0 0 14px;
+    }
+    .field{
+      border:1px solid rgba(255,255,255,.15);
+      background:rgba(255,255,255,.05);
+      border-radius:14px;padding:14px 14px;margin-bottom:10px;
+      color:rgba(255,255,255,.85)
+    }
+    .send{
+      margin-top:12px;background:#2563eb;border-radius:16px;padding:15px 16px;text-align:center;font-weight:900
+    }
+    .stats{
+      display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:16px;
+    }
+    .stat{
+      background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:16px;
+      text-align:center
+    }
+    .stat strong{display:block;font-size:28px;line-height:1.2}
+    section{padding:82px 0}
+    .section-head{text-align:center;max-width:840px;margin:0 auto 34px}
+    .section-head h2{
+      margin:0 0 12px;
+      font-size:clamp(28px,3.6vw,42px);
+      line-height:1.24;letter-spacing:-.02em;color:var(--navy)
+    }
+    .section-head p{margin:0;color:var(--muted);font-size:17px}
+    .grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
+    .card{
+      background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+      padding:26px;box-shadow:0 14px 34px rgba(13,27,42,.05)
+    }
+    .card h3{margin:0 0 10px;font-size:22px;color:var(--navy)}
+    .card p{margin:0;color:var(--muted)}
+    .problem-card{
+      background:linear-gradient(180deg,#fff 0%, #fff7ed 100%);
+    }
+    .problem-icon,.value-icon{
+      width:48px;height:48px;border-radius:16px;
+      display:flex;align-items:center;justify-content:center;
+      font-weight:900;margin-bottom:16px;
+    }
+    .problem-icon{background:#fff;border:1px solid #fde7c2;color:#b45309}
+    .value-icon{background:#edf4ff;border:1px solid #d6e6ff;color:#1d4ed8}
+    .compare{
+      display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:24px;
+    }
+    .compare .card ul{margin:0;padding-left:20px;color:var(--muted)}
+    .compare .card li{margin:8px 0}
+    .compare .card.highlight{
+      background:linear-gradient(180deg,#f8fbff 0%, #edf4ff 100%);
+      border-color:#d7e7ff;
+    }
+    .flow{
+      display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;
+    }
+    .flow-step{padding-top:20px}
+    .step-num{
+      width:40px;height:40px;border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      background:var(--navy);color:#fff;font-weight:900;margin-bottom:16px
+    }
+    .info-band{
+      background:linear-gradient(135deg,var(--navy),var(--navy-2));
+      color:#fff;border-radius:32px;padding:34px;box-shadow:var(--shadow)
+    }
+    .info-band h2{margin:0 0 8px;font-size:34px}
+    .info-band p{margin:0;color:#d6dbe4}
+    .band-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:22px}
+    .band-item{
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:22px;padding:20px
+    }
+    .band-item h3{margin:0 0 8px;font-size:20px}
+    .band-item p{margin:0;color:#d6dbe4}
+    .demo-area{
+      display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:26px
+    }
+    .link-card{
+      background:#fff;border:1px solid var(--line);border-radius:24px;padding:26px;box-shadow:0 14px 34px rgba(13,27,42,.05)
+    }
+    .link-label{
+      display:inline-flex;min-height:34px;padding:0 12px;align-items:center;border-radius:999px;
+      background:#eef4ff;border:1px solid #dbeafe;color:#1d4ed8;font-weight:800;font-size:13px
+    }
+    .link-card h3{margin:14px 0 10px;font-size:28px;color:var(--navy)}
+    .url{
+      margin:0 0 18px;padding:14px 16px;border-radius:14px;
+      background:#f8fafc;border:1px solid var(--line);word-break:break-all;color:#334155
+    }
+    .faq{max-width:900px;margin:0 auto;display:grid;gap:14px}
+    details{
+      background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px 20px;
+      box-shadow:0 14px 34px rgba(13,27,42,.04)
+    }
+    summary{cursor:pointer;font-weight:800;color:var(--navy);list-style:none}
+    summary::-webkit-details-marker{display:none}
+    details p{margin:12px 0 0;color:var(--muted)}
+    footer{padding:40px 20px 60px;color:#64748b;text-align:center}
+    @media (max-width:960px){
+      .hero-inner,.grid-3,.compare,.flow,.band-grid,.demo-area{grid-template-columns:1fr}
+      .hero{padding-top:0}
+      .stats{grid-template-columns:1fr 1fr 1fr}
+      .header-inner{min-height:64px}
+      .header-cta{display:none}
+    }
+    @media (max-width:640px){
+      .wrap{padding:0 16px}
+      .hero-inner{padding:54px 0 46px}
+      .hero-points{grid-template-columns:1fr}
+      .stats{grid-template-columns:1fr}
+      .btn{width:100%}
+      .cta-row{flex-direction:column}
+      .info-band{padding:28px 20px}
+    }
+  </style>
 </head>
 <body>
-<div class="container">
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <div class="brand">
+        <div class="brand-mark">日報</div>
+        <div>日報コスト削減ラボ</div>
+      </div>
+      <div class="header-cta">
+        <a class="btn btn-secondary" href="https://docs.google.com/spreadsheets/d/10yde6qkBIR5Sd2yjKOs45NcbESn6yqvN831nU3MOa4I/edit?usp=drivesdk" target="_blank" rel="noopener noreferrer">管理画面を見る</a>
+        <a class="btn btn-primary" href="https://kame-web-bi.github.io/nippo-app-/app.html" target="_blank" rel="noopener noreferrer">無料デモを見る</a>
+      </div>
+    </div>
+  </header>
 
-<h1>
-日報、まだ手書き→Excel入力してませんか？
-</h1>
+  <section class="hero">
+    <div class="wrap hero-inner">
+      <div>
+        <div class="eyebrow">小規模〜中規模の土木・建設会社向け</div>
+        <h1>日報、まだ<br>手書き→Excel入力<br>してませんか？</h1>
+        <p class="lead">
+          現場で書いて、事務所で入力して、最後に集計。<br>
+          その二度手間を、スマホ1回入力で減らす仕組みです。<br>
+          今のExcel運用を残したまま、まずは併用から始められます。
+        </p>
+        <div class="hero-points">
+          <div class="point">今のExcelはそのままでOK<small>いきなり全部変える必要はありません</small></div>
+          <div class="point">スマホで1回入力<small>現場でそのまま送信できます</small></div>
+          <div class="point">転記ミスを削減<small>紙→PCの打ち直しを減らせます</small></div>
+          <div class="point">会社ごとに項目変更可能<small>入力内容を運用に合わせて調整できます</small></div>
+        </div>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="https://kame-web-bi.github.io/nippo-app-/app.html" target="_blank" rel="noopener noreferrer">無料デモを見る</a>
+          <a class="btn btn-secondary" href="#demo">管理画面も確認する</a>
+        </div>
+      </div>
 
-<div class="box">
-<p>
-小規模の現場でも
-</p>
-<p>
-1日15分 × 人数分の時間がかかっています
-</p>
-<p>
-5人の現場だと
-月4〜5万円分の人件費が消えています
-</p>
-</div>
+      <div class="hero-card">
+        <div class="mock-top">
+          <div class="mock-badge">現場で入力 → そのまま反映</div>
+          <div>5〜20人規模を想定</div>
+        </div>
 
-<div class="box">
-<p>
-現場で書く → 事務所でExcel入力
-</p>
-<p>
-同じ内容を2回やっています
-</p>
-</div>
+        <div class="mock-panel">
+          <div class="mock-title">かんたん日報</div>
+          <div class="field">日付 / 名前</div>
+          <div class="field">現場名</div>
+          <div class="field">作業内容</div>
+          <div class="field">使用重機 / 重機時間</div>
+          <div class="field">作業時間（合計）</div>
+          <div class="send">送信</div>
+        </div>
 
-<div class="box">
-<p>
-この日報を
-スマホ入力に変えるだけで
-</p>
-<p>
-・入力時間短縮<br>
-・集計作業ゼロ<br>
-・転記ミスなし
-</p>
-</div>
+        <div class="stats">
+          <div class="stat"><strong>1回</strong><span>入力</span></div>
+          <div class="stat"><strong>0回</strong><span>転記</span></div>
+          <div class="stat"><strong>調整可</strong><span>項目</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<div class="box">
-<p>
-今のExcelはそのままでOKです
-</p>
-<p>
-いきなり変える必要はありません
-</p>
-<p>
-まずは併用から始められます
-</p>
-</div>
+  <section>
+    <div class="wrap">
+      <div class="section-head">
+        <h2>こんな状態、当たり前になっていませんか？</h2>
+        <p>今のやり方を否定するのではなく、手間になっている部分だけを減らす考え方です。</p>
+      </div>
 
-<a class="btn" href="https://kame-web-bi.github.io/nippo-app-/app.html">
-無料デモを見る
-</a>
+      <div class="grid-3">
+        <div class="card problem-card">
+          <div class="problem-icon">01</div>
+          <h3>現場で手書き</h3>
+          <p>紙で書くこと自体より、そのあとに発生する作業が負担になります。</p>
+        </div>
+        <div class="card problem-card">
+          <div class="problem-icon">02</div>
+          <h3>事務所でExcel入力</h3>
+          <p>同じ内容をもう一度入力することで、時間も確認作業も増えます。</p>
+        </div>
+        <div class="card problem-card">
+          <div class="problem-icon">03</div>
+          <h3>月末に集計</h3>
+          <p>名前別・月別の整理に時間がかかり、締め処理の負担が重くなります。</p>
+        </div>
+      </div>
 
-</div>
+      <div class="compare">
+        <div class="card">
+          <h3>今までのやり方</h3>
+          <ul>
+            <li>現場で手書き</li>
+            <li>事務所でExcel入力</li>
+            <li>確認・修正が発生</li>
+            <li>月末に集計が必要</li>
+          </ul>
+        </div>
+        <div class="card highlight">
+          <h3>この仕組み</h3>
+          <ul>
+            <li>スマホで1回入力</li>
+            <li>そのまま管理表に反映</li>
+            <li>名前別・月別に自動集計</li>
+            <li>会社ごとに入力項目を変更可能</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>使い方はシンプルです</h2>
+        <p>難しい操作はありません。現場の人は、スマホで入力して送信するだけです。</p>
+      </div>
+
+      <div class="flow">
+        <div class="card flow-step">
+          <div class="step-num">1</div>
+          <h3>スマホで入力</h3>
+          <p>日付・名前・現場名・作業内容などを入力します。</p>
+        </div>
+        <div class="card flow-step">
+          <div class="step-num">2</div>
+          <h3>会社ごとに調整</h3>
+          <p>必要な入力項目を、会社の運用に合わせて変更できます。</p>
+        </div>
+        <div class="card flow-step">
+          <div class="step-num">3</div>
+          <h3>そのまま送信</h3>
+          <p>入力した内容をその場で送信。紙の提出は不要です。</p>
+        </div>
+        <div class="card flow-step">
+          <div class="step-num">4</div>
+          <h3>管理表に自動反映</h3>
+          <p>一覧・集計画面でそのまま確認できます。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="info-band">
+        <h2>いきなり全部変える必要はありません</h2>
+        <p>昭和世代の社長にも入りやすいように、まずは今のExcel運用を残したまま、入力だけを変える設計にしています。</p>
+
+        <div class="band-grid">
+          <div class="band-item">
+            <h3>今のExcelを残せる</h3>
+            <p>完全移行ではなく、まずは併用で始められます。</p>
+          </div>
+          <div class="band-item">
+            <h3>5〜20人規模を想定</h3>
+            <p>小規模〜中規模の土木・建設会社向けの現実的な運用を前提にしています。</p>
+          </div>
+          <div class="band-item">
+            <h3>会社ごとに合わせられる</h3>
+            <p>現場名・作業内容・重機・備考など、入力項目を運用に合わせて調整できます。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="demo">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>まずは無料デモで試してください</h2>
+        <p>今のやり方に合うかどうかは、実際に触るのが一番早いです。デモを見てから判断できます。</p>
+      </div>
+
+      <div class="demo-area">
+        <div class="link-card">
+          <div class="link-label">日報入力デモ</div>
+          <h3>スマホ入力を確認</h3>
+          <p class="url">https://kame-web-bi.github.io/nippo-app-/app.html</p>
+          <a class="btn btn-primary" href="https://kame-web-bi.github.io/nippo-app-/app.html" target="_blank" rel="noopener noreferrer">デモを見る</a>
+        </div>
+
+        <div class="link-card">
+          <div class="link-label">管理画面デモ</div>
+          <h3>集計画面を確認</h3>
+          <p class="url">https://docs.google.com/spreadsheets/d/10yde6qkBIR5Sd2yjKOs45NcbESn6yqvN831nU3MOa4I/edit?usp=drivesdk</p>
+          <a class="btn btn-secondary" href="https://docs.google.com/spreadsheets/d/10yde6qkBIR5Sd2yjKOs45NcbESn6yqvN831nU3MOa4I/edit?usp=drivesdk" target="_blank" rel="noopener noreferrer">管理画面を見る</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding-top:20px;">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>よくある質問</h2>
+      </div>
+      <div class="faq">
+        <details open>
+          <summary>今のExcel運用はやめないといけませんか？</summary>
+          <p>いいえ。最初は併用で大丈夫です。今の管理方法を残しながら、入力だけをスマホ化できます。</p>
+        </details>
+        <details>
+          <summary>入力項目は変更できますか？</summary>
+          <p>はい、可能です。会社ごとに必要な項目が違うため、現場名・作業内容・使用重機・重機時間・備考など、運用に合わせて調整できます。</p>
+        </details>
+        <details>
+          <summary>スマホに不慣れでも使えますか？</summary>
+          <p>できるだけシンプルにしています。日報入力に必要な項目だけに絞って、現場で使いやすい形にしています。</p>
+        </details>
+        <details>
+          <summary>何人くらいの会社向けですか？</summary>
+          <p>5〜20人前後の小規模〜中規模の現場を想定しています。大人数での一斉送信は、実際の人数に合わせて確認しながら導入します。</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    日報コスト削減ラボ
+  </footer>
 </body>
 </html>
